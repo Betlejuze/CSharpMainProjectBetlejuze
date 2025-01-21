@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Codice.Client.BaseCommands.WkStatus.Printers;
 using Model.Runtime.Projectiles;
 using UnityEngine;
 
@@ -16,11 +17,16 @@ namespace UnitBrains.Player
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
-            ///////////////////////////////////////
-            // Homework 1.3 (1st block, 3rd module)
-            ///////////////////////////////////////           
-            var projectile = CreateProjectile(forTarget);
-            AddProjectileToList(projectile, intoList);
+            if(GetTemperature() >= overheatTemperature) 
+            {
+                return;
+            }
+            IncreaseTemperature();
+            for (int a = 0; a < GetTemperature(); a++) 
+                {
+                var projectile = CreateProjectile(forTarget);
+                AddProjectileToList(projectile, intoList);
+                }
             ///////////////////////////////////////
         }
 
