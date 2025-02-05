@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Codice.Client.BaseCommands.WkStatus.Printers;
+using Model;
 using Model.Runtime.Projectiles;
 using UnityEngine;
+using Utilities;
 
 namespace UnitBrains.Player
 {
@@ -12,8 +15,7 @@ namespace UnitBrains.Player
         private const float OverheatCooldown = 2f;
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
-        private bool _overheated;
-        
+        private bool _overheated;     
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
@@ -30,23 +32,26 @@ namespace UnitBrains.Player
             IncreaseTemperature();
             ///////////////////////////////////////
         }
-
+        private List<Vector2Int> TargetList = new List<Vector2Int>();
         public override Vector2Int GetNextStep()
         {
+            if (TargetList == null)
+            {
+                return Vector2Int.zero;
+            }
             return base.GetNextStep();
         }
 
         protected override List<Vector2Int> SelectTargets()
+
         {
             //////////////////////DistanceToOwnBase/////////////////
-            List<Vector2Int> result = GetReachableTargets();
-            if (result.Count > 1)
+        float min = float.MaxValue;
+        List<Vector2Int> result = new List<Vector2Int>();
+
+            if (result.Count > 0)
             {
-                
-                float min = float.MaxValue;
                 Vector2Int tar = Vector2Int.zero;
-
-
                 foreach (Vector2Int target in result)
                 {
                     float dis = DistanceToOwnBase(target);
@@ -57,14 +62,22 @@ namespace UnitBrains.Player
 
                     }
                 }
+
                 result.Clear();
-                result.Add(tar);
-                return result;
+                TargetList.Clear();
+                if (IsTargetInRange(tar))
+                    result.Add(tar);
+                else
+                    TargetList.Add(tar);
             }
-            return result;    
-               
+            else
+            {
+                TargetList.Clear();
+                Vector2Int enemyBase = runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId];
+                TargetList.Add(enemyBase);
+            }
+                return result;
         }
-   
         /// /////////////////////////////////////////////////////////////
      
         public override void Update(float deltaTime, float time)
