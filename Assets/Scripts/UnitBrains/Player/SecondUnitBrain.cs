@@ -47,7 +47,8 @@ namespace UnitBrains.Player
         {
             //////////////////////DistanceToOwnBase/////////////////
         float min = float.MaxValue;
-        List<Vector2Int> result = new List<Vector2Int>();
+        List<Vector2Int> result = GetAllTargets().ToList();
+        List<Vector2Int> nextStep = new List<Vector2Int>();
 
             if (result.Count > 0)
             {
